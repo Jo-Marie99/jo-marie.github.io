@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    
+    <section class="p-3 text-center bg-info"><!--Replace -info with different colours from bootstrap. E.g. Primary,secondary,success -->
+      <div >
+        <div class="container">
+          <h1 class="title">Hayes Bestelling/Order</h1>
+        </div>
+      </div>
+    </section>
+
+    <br>
+    <!-- Order Number -->
+    <form id="form" class="container" method="POST">
+      <div class="field">
+        <label class="label">Bestelling/Order</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            placeholder="Consecutive Ref"
+            name="Consecutive Ref"
+            id="valref"
+            readonly="readonly"
+            style="height: 5rem;"
+          />
+        </div>
+      </div>
+      <!-- Beskrywing -->
+      <div >
+        <label class="label">Beskrywing</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            placeholder="Beskrywing van wat u wil koop"
+            name="Beskrywing"
+            style="height: 5rem;"
+          />
+        </div>
+      </div>
+
+     <!-- Submit button -->
+      <br>
+      <div class="cont">
+        <div class="control">
+          <button
+            class="button is-primary"
+            type="submit"
+            id="submit-button"
+            data-bs-toggle="modal"
+            id="btntarget"
+            class="my-sm-5"
+            style="height: 5rem; width: 100%;"
+          >
+            Submit
+          </button>
+        </div>
+
+
+
+        <!-- Modal/Pop up -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Order Details
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div id="target">
+                  <p id="consecutive"></p>
+                  <p id="beskrywing"></p>
+                  <p id="besigheid"></p>
+                  <p id="afdeling"></p>
+                </div>
+              </div>
+              <div class="modal-footer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div
+      id="message"
+      style="
+        display: none;
+        margin: 20px;
+        font-weight: bold;
+        color: green;
+        padding: 8px;
+        background-color: beige;
+        border-radius: 4px;
+        border-color: aquamarine;
+      "
+    ></div>
+    <script>
+      // This code runs on start of page. This code retrieves the data for the drop down menus
+      const Number_url =
+        "https://script.google.com/macros/s/AKfycbw74aGRlqietLx7Mw1UkdWvqpyIOLcHOgPAiYNTYUZDGQAfdSVyzqqt8GRCSKqXEJ0B/exec";
+      
+      const output = document.querySelector("#optionList");
+      var numberval = 0
+      window.addEventListener("load", (e) => {
+        
+        fetch(Number_url)
+          .then((res3) => res3.json())
+          .then((data3) => {
+            console.log("Consecutive Ref");
+            //console.log(data3.length-1);
+            numberval = data3.length;
+            console.log(numberval);
+            //valref
+            //document.querySelector("#valref").value = "test"
+            document.getElementById("valref").value = numberval
+          });
+      });
+      
+      function addData(data) {
+        select = document.getElementById("optionList");
+
+        data.forEach((row, index) => {
+          if (index < 1) return;
+
+          var opt = document.createElement("option");
+          opt.value = `${row.besigheid}`;
+          opt.innerHTML = `${row.besigheid}`;
+          select.appendChild(opt);
+        });
+      }
+
+      function addData2(data2) {
+        select = document.getElementById("optionList2");
+
+        data2.forEach((row, index) => {
+          if (index < 1) return;
+
+          var opt2 = document.createElement("option");
+          opt2.value = `${row.afdeeling}`;
+          opt2.innerHTML = `${row.afdeeling}`;
+          select.appendChild(opt2);
+        });
+      }
+    </script>
+    <script>
+      //This handles the population of the modal with order details
+
+      const button = document.getElementById("btntarget");
+      const targetDiv = document.getElementById("target");
+
+      function changeContent() {
+        var postedData = getFormData();
+
+        var values = postedData.map(function (item) {
+          return item.split("=")[1];
+        });
+
+        targetDiv.querySelector(
+          "#consecutive"
+        ).innerHTML = `Order Number: ${values[0]}`;
+        targetDiv.querySelector(
+          "#beskrywing"
+        ).innerHTML = `Beskrywing: ${values[1]}`;
+
+      }
+
+      button.addEventListener("click", changeContent);
+    </script>
+    <script>
+      function getFormData() {
+        var form = document.getElementById("form");
+        const formData = new FormData(form);
+        const keyValuePairs = [];
+        for (const pair of formData.entries()) {
+          keyValuePairs.push(`${pair[0]}=${pair[1]}`);
+        }
+        return keyValuePairs;
+      }
+    </script>
+    <script>
+      //This handles the form submission that adds data to the sheet
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault(); // Prevent the default form submission
+        document.getElementById("message").textContent = "Submitting..";
+        document.getElementById("message").style.display = "block";
+        document.getElementById("submit-button").disabled = true;
+
+        // Collect the form data
+        var formKeyValueairs = getFormData();
+
+        var formDataString = formKeyValueairs.join("&");
+
+        // Send a POST request to your Google Apps Script
+        fetch(
+          "https://script.google.com/macros/s/AKfycbwB4IlpXWx8IYHifTqwlTgGZcfCN21N9WleG30XJFOh81pEsgXzFOdHa1JzCmDzftzwZw/exec",
+          {
+            redirect: "follow",
+            method: "POST",
+            body: formDataString,
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+          }
+        )
+          .then(function (response) {
+            // Check if the request was successful
+            if (response) {
+              return response; // Assuming your script returns JSON response
+            } else {
+              throw new Error("Failed to submit the form.");
+            }
+          })
+          .then(function (data) {
+            // Display a success message
+            document.getElementById("message").textContent =
+              "Data submitted successfully!";
+            document.getElementById("message").style.display = "block";
+            document.getElementById("message").style.backgroundColor = "green";
+            document.getElementById("message").style.color = "beige";
+            document.getElementById("submit-button").disabled = false;
+
+            const modal = new bootstrap.Modal(
+              document.getElementById("exampleModal")
+            );
+            modal.show();
+
+            changeContent();
+
+            document.getElementById("form").reset();
+
+            setTimeout(function () {
+              document.getElementById("message").textContent = "";
+              document.getElementById("message").style.display = "none";
+            }, 2600);
+          })
+          .catch(function (error) {
+            // Handle errors, you can display an error message here
+            console.error(error);
+            document.getElementById("message").textContent =
+              "An error occurred while submitting the form.";
+            document.getElementById("message").style.display = "block";
+          });
+      });
+    </script>
+
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
