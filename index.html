@@ -53,6 +53,62 @@
         </div>
       </div>
 
+       <!-- Besigheid -->
+       <div>
+        <label class="label">Besigheid</label>
+        <div > 
+          <div >
+            <select
+              id="optionList"
+              script="addData"
+              class="form-select"
+              type="text"
+              name="Besigheid"
+              style="height: 5rem;"
+            >
+              <option>Kies besigheid</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Afdeling -->
+      <div>
+        <label class="label">Afdeeling</label>
+        <div>
+          <div>
+            <select
+              id="optionList2"
+              script="addData2"
+              class="form-select"
+              type="text"
+              name="Afdeeling"
+              style="height: 5rem;"
+            >
+              <option>Kies Afdeling</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Bestuurder -->
+      <div>
+        <label class="label">Bestuurder</label>
+        <div>
+          <div>
+            <select
+              id="optionList4"
+              script="addData4"
+              class="form-select"
+              type="text"
+              name="Bestuurder"
+              style="height: 5rem;"
+            >
+              <option>Kies Bestuurder</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
      <!-- Submit button -->
       <br>
       <div class="cont">
@@ -98,7 +154,8 @@
                   <p id="consecutive"></p>
                   <p id="beskrywing"></p>
                   <p id="besigheid"></p>
-                  <p id="afdeling"></p>
+                  <p id="afdeeling"></p>
+                  <p id="bestuurder"></p>
                 </div>
               </div>
               <div class="modal-footer"></div>
@@ -125,6 +182,16 @@
       const Number_url =
         "https://script.google.com/macros/s/AKfycbw74aGRlqietLx7Mw1UkdWvqpyIOLcHOgPAiYNTYUZDGQAfdSVyzqqt8GRCSKqXEJ0B/exec";
       
+
+        const url =
+        "https://script.google.com/macros/s/AKfycbwpnfk6AiZgnTqweQUvVEUvlGzwyr3MWBiH5ivQJCEpjbMnjkbK1K-EjrWOzAK35d5BEQ/exec";
+      const url_afdeeling =
+        "https://script.google.com/macros/s/AKfycbzUit0wmOWON2qO-7xf1pjyZad8KUNLraMV-2TbBYhraJEiw4OlAOk_6nWFgX6fixlv_Q/exec";
+
+      const url_bestuurder =
+      "https://script.google.com/macros/s/AKfycbwOTMvHf224bMq2RlagkOymZefKoMD9q2vx1OuasO4JsJnCGtpy8jQwv55aMPHoAQAf8g/exec";
+      
+      
       const output = document.querySelector("#optionList");
       var numberval = 0
       window.addEventListener("load", (e) => {
@@ -139,6 +206,27 @@
             //valref
             //document.querySelector("#valref").value = "test"
             document.getElementById("valref").value = numberval
+          });
+          fetch(url)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("Besigheid");
+            console.log(data);
+            addData(data);
+          });
+        fetch(url_afdeeling)
+          .then((res2) => res2.json())
+          .then((data2) => {
+            console.log("Afdeeling");
+            console.log(data2);
+            addData2(data2);
+          });
+          fetch(url_bestuurder)
+          .then((res4) => res4.json())
+          .then((data4) => {
+            console.log("Bestuurder");
+            console.log(data4);
+            addData4(data4);
           });
       });
       
@@ -167,6 +255,21 @@
           select.appendChild(opt2);
         });
       }
+    
+      function addData4(data4) {
+        select = document.getElementById("optionList4");
+
+        data4.forEach((row, index) => {
+          if (index < 1) return;
+
+          var opt4 = document.createElement("option");
+          opt4.value = `${row.bestuurder}`;
+          opt4.innerHTML = `${row.bestuurder}`;
+          select.appendChild(opt4);
+        });
+      }
+        
+
     </script>
     <script>
       //This handles the population of the modal with order details
@@ -187,7 +290,15 @@
         targetDiv.querySelector(
           "#beskrywing"
         ).innerHTML = `Beskrywing: ${values[1]}`;
-
+        targetDiv.querySelector(
+          "#besigheid"
+        ).innerHTML = `Besigheid: ${values[2]}`;
+        targetDiv.querySelector(
+          "#afdeeling"
+        ).innerHTML = `Afdeeling: ${values[3]}`;
+        targetDiv.querySelector(
+          "#bestuurder"
+        ).innerHTML = `Bestuurder: ${values[4]}`;
       }
 
       button.addEventListener("click", changeContent);
